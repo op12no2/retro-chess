@@ -17,10 +17,10 @@ Two mechanisms, chosen per entry:
     on slow.exe just gets its slow.txt delay rewritten.
 
 Prefixes are matched case-insensitively against the start of the entry name
-("Elo World", "SOMA", "Fairy", "Random Mover", "Searchless").  MS 0 restores
+("SOMA", "Fairy", "Random Mover", "Searchless").  MS 0 restores
 instant replies (option 0 / proxy delay 0; the proxy stays in place).
 
-Example:  python3 tools/myracle_move_delay.py 2000 "Elo World" SOMA Searchless Fairy "Random Mover"
+Example:  python3 tools/myracle_move_delay.py 2000 SOMA Searchless Fairy "Random Mover"
 """
 import gzip, json, os, re, shutil, sys, time
 

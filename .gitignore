@@ -6,12 +6,8 @@
 /soma
 /tech
 /turochamp
-/eloworld
-/elofish
 /abramson
 /uct
 *.exe
 config.json
 *.pgn
-stockfish10-linux
-Topple*.exe

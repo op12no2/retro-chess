@@ -16,8 +16,7 @@ cost of fidelity.
 - This repo: `~/retro` (WSL). Sessions start here.
 - Myracle's engine folders, on the Windows drive:
   `/mnt/d/myracle/engines/retro/` holds our exes; copy them there
-  after a rebuild (`cp *.exe /mnt/d/myracle/engines/retro/`). It also
-  holds `stockfish_10_x64.exe` and `Topple_v0.3.5_x86_64.exe` for elofish.
+  after a rebuild (`cp *.exe /mnt/d/myracle/engines/retro/`).
   `/mnt/d/myracle/engines/oldies/` holds Sargon, Psion and the downloaded
   or rebuilt historic and quirky engines, one folder each, with
   `oldies/README.md` recording protocol, provenance and quirks.
@@ -36,10 +35,6 @@ cost of fidelity.
   change in search semantics can silently alter a recreation.
 - `<engine>.c`: one per programme. Header comment names the primary sources
   and lists every judgement call as `[choice]`. Keep that discipline.
-  `eloworld_data.h` is the one data header (Murphy's fate table and the
-  hex digits of pi and e), generated, not hand-edited. `elofish.c` is the
-  one engine that spawns other programs (Stockfish 10, Topple 0.3.5 beside
-  the exe; sources in README); keep those child exes out of git.
 - `build.sh [engine...]`: builds `<engine>` (Linux) and `<engine>.exe`
   (static Windows, mingw-w64). Binaries are git-ignored and shipped as
   GitHub releases.
@@ -59,7 +54,7 @@ equal-scoring moves, so this is how lexicographic tie-breaks are done),
 `ENG_CUTOFF` (treat an interior node as a leaf), `ENG_COMMAND` (console
 debug commands). `game_start` and `game_moves[]` hold the position the
 last `position` command began from and the moves since, for engines
-whose choice depends on the game so far. A no-search engine (eloworld) does all its choosing in
+whose choice depends on the game so far. A no-search engine does all its choosing in
 `eng_root_order`, puts the move in `mv[0]` and returns 1: the driver then
 plays that move without letting its own mate and stalemate scoring
 interfere. `cfg` fields: `alphabeta`, `qdepth`, `fixed_depth`,

@@ -1,7 +1,7 @@
 # retro
 
 Faithful recreations of the earliest chess programmes, 1948 to 1971, as
-UCI engines, plus two later experiments that belong with them in spirit.
+UCI engines, plus three later experiments that belong with them in spirit.
 Each engine is one C file written from the original paper or thesis, built
 as a single static Windows or Linux executable with no dependencies.
 
@@ -16,8 +16,6 @@ as a single static Windows or Linux executable with no dependencies.
 | abramson | 1987 | Bruce Abramson | the expected-outcome sampler: random games to the end decide the move, the first random-playout evaluation |
 | beal | 1994 | Don Beal, Martin Smith | alpha-beta over a purely random evaluation |
 | uct | 2006 | Levente Kocsis, Csaba Szepesvári | Monte Carlo tree search with the UCB1 bandit rule and random playouts, as Ramanujan, Sabharwal and Selman ran it on chess |
-| eloworld | 2019 | Tom Murphy VII | the zero-lookahead players of "Elo World" (24 from the paper, 4 from his repository): random, alphabetical, cccp, pacifist, suicide king, the fate-based players and friends |
-| elofish | 2019 | Tom Murphy VII | the engine-backed Elo World entrants: Stockfish 10 at skill levels 0 to 20, stockfish1m, worstfish, the fifteen random blends and Topple; drives the real engines, which sit beside it |
 
 Binaries are on the Releases page. Build from source with `./build.sh`
 (needs gcc and `x86_64-w64-mingw32-gcc`), or `./build.sh tech` for one
@@ -51,12 +49,6 @@ was:
 - **Tech**'s root heuristics are the thesis's tables to the point: centre
   control array, piece priorities per phase, P-K4 +30, O-O +30, N-R3 -15,
   piece blocking a centre pawn -50, and so on.
-- **Elo World** replays the paper's Figure 6 game, cccp against suicide_king,
-  and picks every one of cccp's seven moves (1.d4, 2.Bxg5, 3.Bxe7, 4.d5,
-  5.dxc6+, 6.Qd6+, 7.e4#); in the Figure 4 game each of swarm's six moves
-  up to 6.Qh5# has the lowest penalty on the board, as it must since swarm
-  breaks ties at random. single_player finds the Scholar's mate from the
-  start position (e4, Qf3, Bc4, Qxf7, with Black passing), as Murphy's did.
 - **Kotok-McCarthy** uses every weight the thesis gives, but is built from
   the thesis's description rather than its FORTRAN listing, which survives
   only as an image scan. It opens 1.Nc3 where the original opened 1.e4, so
@@ -246,86 +238,6 @@ per episode, children tried in random order before the bound takes over,
 the tree discarded between moves, mate and stalemate exact. `uct` on the
 console runs 2000 episodes and lists the root moves with visits and means.
 
-### eloworld (2019)
-
-Tom Murphy VII's ["Elo World, a framework for benchmarking weak chess
-engines"](http://tom7.org/chess/weak.pdf) (SIGBOVIK 2019, with a
-[video](https://www.youtube.com/watch?v=DpXy041BIlA)) played dozens of
-deliberately silly engines against one another to extend the Elo scale down
-to the worst possible play. This engine recreates his zero-lookahead
-players from the source in his
-[svn repository](https://sourceforge.net/p/tom7misc/svn/HEAD/tree/trunk/chess/)
-(player.cc, fate-player.cc, numeric-player.cc, chess.cc). Twenty-four of
-them have Elo rows in the paper, single_player is described there without
-one, and alphamove, binary_pi and binary_e were added to his repository
-later. The UCI option `Player` chooses one of the twenty-eight: `random_move`, `first_move` (lowest
-move code), `alphabetical` (first in short algebraic notation, so 1.Na3:
-capitals sort before pawn moves), `alphamove` (the alphabetical median,
-after xkcd 3045), `cccp` (Checkmate, Check, Capture, Push), `pacifist`,
-`min_oppt_moves`, `suicide_king`, `reverse_starting`, `huddle`, `swarm`,
-`generous`, `no_i_insist`, `same_color`, `opposite_color`, `sym_mirror_y`,
-`sym_mirror_x`, `sym_180`, `single_player` (looks `Depth` moves ahead,
-default 4, as if the opponent never moved and plays the first move of the
-shortest mate it finds, otherwise a random move), the six fate-based
-players `safe`, `dangerous`, `popular`, `rare`, `survivalist` and
-`fatalist` (which steer each piece by the probability, over every lichess
-game to November 2018, of it ending the game alive or captured on a given
-square; the table is `eloworld_data.h`), `equalizer` (move the piece
-moved least to the square visited least) and `binary_pi` / `binary_e`
-(index the alphabetically sorted moves with the next bits of the
-constant). The source header describes each rule and every quirk kept from
-Murphy's code: his castling-rook piece type, the colour bit in his
-promotion codes, a comparator that calls a knight capture and a bishop
-capture "different but neither better", a "forced gift" tier in
-no_i_insist that can never fire, and a shadowed variable in the fate
-players that turns safe, dangerous, popular and rare from weighted-random
-samplers into "the first move in generation order that is not a worst
-move". That last one was in the code the paper's tournament ran, and the
-paper's Elo for those four (349 to 361) sits next to first_move rather
-than next to the random movers, so it is reproduced. Moves are generated
-in his order wherever that order decides a tie. Paper Elo: pacifist 287,
-alphabetical 321, generous 343, popular 349, dangerous 350, safe 351,
-first_move 358, rare 361, no_i_insist 378, huddle 400, sym_180 430,
-same_color 431, opposite_color 432, sym_mirror_x 439, survivalist 439,
-random_move 439, fatalist 440, sym_mirror_y 443, reverse_starting 446,
-suicide_king 447, equalizer 504, swarm 534, cccp 554, min_oppt_moves 597.
-Console command `elo [player]` lists the legal moves in Murphy's order
-with each one's penalty, score, code or alphabetical rank and marks the
-choice.
-
-### elofish (2019)
-
-The rest of the Elo World field: the entrants that call a real engine. The
-UCI option `Player` picks `stockfish0`, `stockfish5`, `stockfish10`,
-`stockfish15`, `stockfish20` (Stockfish at that Skill Level, asked for a
-move with a bare `go`, which Stockfish treats as time management with no
-time and answers in milliseconds, hence the paper's "basically
-instantaneously"), `stockfish1m` (Skill Level 20, a million nodes),
-`worstfish` (asks Stockfish how much the opponent likes the position after
-each legal move and plays the one it likes best), the fifteen
-`stockfish1m_rNNN` blends (a 16-bit random number below NNN means a random
-move, otherwise stockfish1m's; NNN runs 64, 128, ... 32768, 49152, 57344,
-61440, 63488, 64512) and `topple10k` / `topple1m` (Topple with a node
-budget). As in Murphy's code the engine is reset before every move with a
-FEN whose move counters read 10 and 10 and no history, so it cannot see
-repetitions, and no book, tablebase or hash clearing is used. The paper
-calls worstfish "configured as stockfish0" but the code, then and now, uses
-level 20; the code is followed and `WorstfishLevel` lets you choose. The
-exe needs `stockfish_10_x64.exe` and `Topple_v0.3.5_x86_64.exe` beside it
-(options `StockfishPath`, `TopplePath`); Stockfish 10 is built from the
-`sf_10` tag of the official repository with
-`make build ARCH=x86-64 COMP=mingw CXX=x86_64-w64-mingw32-g++`, Topple
-0.3.5 is Vincent Tang's release binary (Murphy ran the znver1 build on his
-Threadripper). Paper Elo: worstfish 189, r64512 463, r63488 482, r61440
-521, r57344 601, r49152 752, r32768 976, r16384 1278, stockfish0 1336,
-stockfish5 1645, r8192 1690, topple10k 1772, stockfish10 1915, stockfish15
-1953, r4096 2020, stockfish20 2139, topple1m 2219, r2048 2262, r1024 2426,
-r512 2522, r256 2582, r128 2609, r64 2638, stockfish1m 2644. Not
-recreated from the paper: chessmaster.nes_lv1 and lv2 (an emulated NES
-Chessmaster) and the three blind players (their network file is not in the
-repository). Console command `fish` shows the FEN sent and the engine's
-answer.
-
 ## Related reading
 
 `RESEARCH.md` holds the survey behind this collection: which other early
@@ -349,8 +261,6 @@ strength.
 | abramson | Abramson, [*The Expected-Outcome Model of Two-Player Games*](https://academiccommons.columbia.edu/doi/10.7916/D8GH9S2C), Columbia CUCS-315-87, 1987; "Expected-Outcome: A General Model of Static Evaluation", IEEE PAMI 12(2), 1990 | [CPW](https://www.chessprogramming.org/Bruce_Abramson) |
 | beal | Beal and Smith, "Random Evaluations in Chess", ICCA Journal 17(1), 1994 | [CPW](https://www.chessprogramming.org/Don_Beal) |
 | uct | Kocsis and Szepesvári, "Bandit based Monte-Carlo Planning", ECML 2006; Ramanujan, Sabharwal and Selman, [ICAPS 2010](https://ojs.aaai.org/index.php/ICAPS/article/view/13437) and [UAI 2010](https://arxiv.org/abs/1203.4011) | [CPW](https://www.chessprogramming.org/UCT) |
-| eloworld | Murphy, [*Elo World*](http://tom7.org/chess/weak.pdf), SIGBOVIK 2019; [source](https://sourceforge.net/p/tom7misc/svn/HEAD/tree/trunk/chess/) | [video](https://www.youtube.com/watch?v=DpXy041BIlA), [CPW](https://www.chessprogramming.org/Tom_Murphy_VII) |
-| elofish | as eloworld (stockfish.cc, stockfish-player.cc, uci-player.cc); [Stockfish 10](https://github.com/official-stockfish/Stockfish/tree/sf_10), [Topple 0.3.5](https://github.com/konsolas/ToppleChess/releases/tag/v0.3.5) | |
 
 ## Credits
 

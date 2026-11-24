@@ -63,7 +63,6 @@ NEW=[
  ("Searchless 270M 2024",  "searchless",   "searchless_270M.exe",             "uci",    "DeepMind searchless_chess 270M transformer, no search (2895 Lichess blitz Elo in the paper); launcher runs the JAX model in WSL on the GPU (README.txt)"),
 ]
 # our own recreations in engines/retro: name, exe, comment, {option: value}
-EW="Tom Murphy VII's Elo World (2019) player %s, see retro README"
 # folders that belong to the user's "The Naughties" group (the 2000s field)
 # the On Being Emulated field: original machine code run under emulation or straight ports
 EMULATED={'messchess','cyrus','crayblitz'}
@@ -71,19 +70,8 @@ NAUGHTIES={'fruit21','toga','glaurung22','sf1','crafty2014','rybka10','spike12',
 # approximate CCRL 40/15 ratings for the Naughties (from memory, rounded; good enough for seeding)
 ELO={'rybka10':2800,'glaurung22':2790,'sf1':2790,'toga':2760,'spike12':2730,'fruit21':2700,'prodeo':2650,
      'crafty2014':2640,'zappa11':2620,'ruffian105':2600,'delfi54':2560,'pharaon351':2540,'gandalf6':2520,'yace':2460}
-NEW_RETRO=[("Elo World %s 2019"%p, "eloworld.exe", EW%p, {"Player":p}) for p in
- ("random_move","first_move","alphabetical","alphamove","cccp","pacifist","min_oppt_moves",
-  "suicide_king","reverse_starting","huddle","swarm","generous","no_i_insist","same_color",
-  "opposite_color","sym_mirror_y","sym_mirror_x","sym_180","single_player",
-  "safe","dangerous","popular","rare","survivalist","fatalist","equalizer","binary_pi","binary_e")]
-EF="Tom Murphy VII's Elo World (2019) engine-backed entrant %s; needs stockfish_10_x64.exe / Topple_v0.3.5_x86_64.exe beside elofish.exe"
-NEW_RETRO+=[("Abramson 1987", "abramson.exe", "Abramson's expected-outcome sampler: random games to the end from each move, no lookahead; set Converge=false and MaxSamples=0 to use the clock", {}),
+NEW_RETRO=[("Abramson 1987", "abramson.exe", "Abramson's expected-outcome sampler: random games to the end from each move, no lookahead; set Converge=false and MaxSamples=0 to use the clock", {}),
             ("UCT 2006", "uct.exe", "Kocsis and Szepesvari's UCT with uniformly random playouts, Ramanujan et al.'s chess settings (exploration 0.4, rewards -1/0/+1)", {})]
-NEW_RETRO+=[("Elo World %s 2019"%p, "elofish.exe", EF%p, {"Player":p}) for p in
- ("stockfish0","stockfish5","stockfish10","stockfish15","stockfish20","stockfish1m","worstfish",
-  "stockfish1m_r64","stockfish1m_r128","stockfish1m_r256","stockfish1m_r512","stockfish1m_r1024","stockfish1m_r2048",
-  "stockfish1m_r4096","stockfish1m_r8192","stockfish1m_r16384","stockfish1m_r32768","stockfish1m_r49152",
-  "stockfish1m_r57344","stockfish1m_r61440","stockfish1m_r63488","stockfish1m_r64512","topple10k","topple1m")]
 def num(s):
     try: return int(s)
     except: 
@@ -149,9 +137,7 @@ for row in NEW:
     engines.append(e); added.append((name,len(e.get('options',[]))))
 for name,exe,comment,values in NEW_RETRO:
     if name in have: continue
-    # the Elo World players get their own groups: eloworld (no search) and elofish (engine-backed)
-    group={'eloworld.exe':'eloworld','elofish.exe':'elofish'}.get(exe,'retro')
-    e={'name':name,'group':group,'command':exe,'working_folder':'engines/retro','protocol':'uci','comment':comment}
+    e={'name':name,'group':'retro','command':exe,'working_folder':'engines/retro','protocol':'uci','comment':comment}
     e['options']=uci_options(RETRO,exe)
     for x in e['options']:
         if x['name'] in values: x['value']=values[x['name']]
