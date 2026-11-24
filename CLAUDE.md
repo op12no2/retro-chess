@@ -87,16 +87,7 @@ so it is only good for our own engines (which force binary stdout). For
 downloaded exes use the Windows cutechess-cli from a directory under
 `/mnt/d` so relative paths resolve:
 `cutechess-cli.exe -engine cmd=x.exe dir=folder proto=xboard|uci name=X -engine cmd=tech.exe dir=. proto=uci name=Tech -each tc=60+1 timemargin=3000 -rounds 1 -games 2 -repeat -concurrency 2 -pgnout t.pgn`.
-Downloaded exes need `chmod +x` before WSL will launch them. To slow a
-third-party engine down for watching, `tools/slow.c` (`slow.exe`, build
-line in its header) is a stdio proxy: put it in the engine's folder with a
-`slow.txt` (line 1 the real command, line 2 the delay in ms), point the
-entry's command at `slow.exe` and keep the protocol; it holds `bestmove`,
-`move` and protocol-1 move lines until the delay has passed since the GUI's
-last line and passes everything else straight through. An optional third
-line in `slow.txt` (e.g. `go movetime 20`) replaces every `go` the GUI
-sends, which is how a fixed-effort reference such as `oldies/sf10_20ms`
-is made, since Myracle's clock is per tournament, not per engine. Probe first
+Downloaded exes need `chmod +x` before WSL will launch them. Probe first
 with `printf 'uci\n'` or `printf 'xboard\nprotover 2\n'` (sleep before
 `quit`). Use 60+1 rather than 10s+0.1: old engines lose on time at bullet.
 Keep concurrency at 2 on this machine. Lessons so far: micro-Max omitted
@@ -122,8 +113,7 @@ that passes cutechess can still fail in Myracle; probe with `protover 2`.
   until that long after `go`, `stop` releases it) and `LogFile`; the
   delay exists so the search-free engines can be watched at a human pace
   (Myracle has no setting for this). Adding a common option means every
-  stored Myracle entry needs it (`tools/myracle_move_delay.py` adds
-  `MoveDelay`), or Myracle refuses to start the engine. Shannon's are `Type`, `AlphaBeta`, `QuiescenceDepth`, `Width`,
+  stored Myracle entry needs it, or Myracle refuses to start the engine. Shannon's are `Type`, `AlphaBeta`, `QuiescenceDepth`, `Width`,
   `Extensions`; the user runs Type B, Width 4, QuiescenceDepth 4,
   Extensions 3.
 
@@ -147,12 +137,7 @@ Myracle stores its engines in `/mnt/d/myracle/config/engines.json.gz`: a
 gzip of a plain JSON array (name, group, command, working_folder relative
 to `/mnt/d/myracle`, protocol, optional comment, options[] with
 name/type/default/min/max or choices/value). Myracle rewrites it on exit, so
-only edit it while Myracle is closed, and back it up first. Scripts in
-`tools/`: `myracle_add_engines.py` (bulk add, probes UCI options),
-`myracle_test_config.py` (launch every entry through cutechess as
-configured), `myracle_fix_defaults.py` (refresh stored defaults), `myracle_move_delay.py MS
-[name-prefix ...]` (adds the `MoveDelay` option to our entries and sets it,
-or wraps third-party entries in `slow.exe`).
+only edit it while Myracle is closed, and back it up first.
 
 Gotchas: if an exe is rebuilt with different option defaults, Myracle
 compares the stored `default` fields with what the engine reports and
