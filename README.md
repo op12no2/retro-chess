@@ -264,7 +264,7 @@ strength.
 
 ## Credits
 
-Written by Claude (Anthropic) for op12no2's "Retro Fun" engine
-tournament, November 2026, from the primary sources named in each file.
+Written by Claude (Anthropic), November 2026, from the primary sources
+named in each file.
 The original programmes belong to their authors; these are recreations and
 say so in their UCI `id author` strings.
