@@ -23,8 +23,9 @@ engine. Every engine honours `go wtime/btime/winc/binc`, `movetime`,
 `depth`, `nodes`, `infinite` and `stop`, reports depth, score, nodes, nps
 and principal variation, and has a `LogFile` option that mirrors the UCI
 traffic to a file and a `MoveDelay` option (milliseconds) that holds the
-reply so the search-free ones can be watched at a human pace. Console commands `perft N`, `eval` and `d` work in all of
-them, and most have one more that shows the engine's own reasoning.
+reply so the search-free ones can be watched at a human pace. Console
+commands `perft N`, `eval` and `d` (print the board) work in all of them,
+and most have one more that shows the engine's own reasoning.
 
 ## How faithful?
 
