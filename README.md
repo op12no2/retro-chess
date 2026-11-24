@@ -1,4 +1,4 @@
-# retro
+# retro-chess
 
 Faithful recreations of the earliest chess programmes, 1948 to 1971, as
 UCI engines, plus three later experiments that belong with them in spirit.
